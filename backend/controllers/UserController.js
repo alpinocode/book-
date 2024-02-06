@@ -62,9 +62,29 @@ export const Login = async (req,res) => {
             httpOnly: true,
             maxAge:  24 * 60 * 60 * 1000
         })
+        res.status(200).json(accessToken)
     } catch (error) {
         res.status(401).json({
             message: "No email"
         })    
     }
+}
+
+export const Logout = async (req,res) => {
+        const refreshToken = await req.cookie.refreshToken
+        if(!refreshToken) return res.sendStatus(204)
+        const user = await Users.findAll({
+            where: {
+                refresh_token: refreshToken
+            }
+        })
+        if(!user[0]) await res.sendStatus(204)
+        const userId = user[0].id
+        await Users.update({refreshToken: null}, {
+            where: {
+                id: userId
+            }
+        })
+        res.clearCookie('refreshToken')
+        return res.sendStatus(200)
 }
