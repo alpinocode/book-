@@ -38,34 +38,33 @@ export const Login = async (req,res) => {
     try {
         const user = await Users.findAll({
             where: {
-                email: req.body.email
+                email: req.params.id
             }
         })
-        const match = await bcrypt.compare(req.body.password, user[0].password)
-        if(!match) return res.status(403).json("Wrong password")
-        const userId = user[0].id
-        const userName = user[0].name
-        const userEmail = user[0].email
-
-        const accessToken = jwt.sign({userId,userName, userEmail }, ACCESS_TOKEN_SECRET, {
-            expiresIn: '60s'
+        const match = await bcrypt.compare(req.params.password, user[0].password)
+        if(!match) return res.status(403).json({message: "Wrong password"})
+        const userId = user[0].id;
+        const name = user[0].id;
+        const email = user[0].id;
+        const accessToken = jwt.sign({userId, name, email}, ACCESS_TOKEN_SECRET,{
+            expiresIn: '60d'
         })
-        const refreshToken = jwt.sign({userId, userName, userEmail}, REFRESH_TOKEN_SECRET, {
+        const refreshToken = jwt.sign({userId, name, email}, REFRESH_TOKEN_ACCESS,{
             expiresIn: '1d'
         })
-        await Users.update({refresh_token: refreshToken}, {
+        await Users.update({refresh_token: refreshToken },{
             where: {
                 id: userId
             }
         })
+
         res.cookie('refreshToken', refreshToken, {
-            httpOnly: true, // only http access is allowed
-            maxAge: 24 * 60 * 60 * 1000  // setting 1 day
+            httpOnly: true,
+            maxAge:  24 * 60 * 60 * 1000
         })
-        res.status(200).json(accessToken)
     } catch (error) {
         res.status(401).json({
-            message: "email tidak ada"
-        })
+            message: "No email"
+        })    
     }
 }
