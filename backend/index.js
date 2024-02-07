@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 // route
 import userRoute from "./routes/UserRoute.js";
@@ -15,7 +16,6 @@ dotenv.config()
 try {
     await db.authenticate()
     console.log('Database running')
-    await db.sync()
 } catch (error) {
     console.log(error)    
 }
@@ -24,6 +24,7 @@ const port = process.env.PORT
 
 const app = express()
 
+app.use(cookieParser())
 app.use(express.json())
 app.use(userRoute)
 app.use(noteRoute)
