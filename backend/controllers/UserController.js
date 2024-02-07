@@ -1,5 +1,5 @@
 import Users from "../models/UserModel.js";
-import jtw from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
 
@@ -22,6 +22,7 @@ export const Register = async (req,res) => {
     if(password !== confPassword) return res.status(401).json({ message: 'Wrong password'})
     const salt = await bcrypt.genSalt()
     const hastPassword = await bcrypt.hash(password, salt)
+    
     try {
         await Users.create({
             name: name,
@@ -30,26 +31,28 @@ export const Register = async (req,res) => {
         })
         res.status(200).json({message: 'create to register'})
     } catch (error) {
-        console.log(error)
+        res.status(500).json({
+            message: error.message
+        })
     }
 }
 
 export const Login = async (req,res) => {
     try {
-        const user = await Users.findAll({
+       const user = await Users.findAll({
             where: {
                 email: req.body.email
             }
-        })
-        const match = await bcrypt.compare(req.params.password, user[0].password)
+       })
+        const match = await bcrypt.compare(req.body.password, user[0].password)
         if(!match) return res.status(403).json({message: "Wrong password"})
         const userId = user[0].id;
-        const name = user[0].id;
-        const email = user[0].id;
-        const accessToken = jwt.sign({userId, name, email}, ACCESS_TOKEN_SECRET,{
-            expiresIn: '60d'
+        const name = user[0].name;
+        const email = user[0].email;
+        const accessToken = jwt.sign({userId, name, email}, process.env.ACCESS_TOKEN_SECRET,{
+            expiresIn: '30s'
         })
-        const refreshToken = jwt.sign({userId, name, email}, REFRESH_TOKEN_ACCESS,{
+        const refreshToken = jwt.sign({userId, name, email}, process.env.REFRESH_TOKEN_SECRET,{
             expiresIn: '1d'
         })
         await Users.update({refresh_token: refreshToken },{
@@ -64,8 +67,9 @@ export const Login = async (req,res) => {
         })
         res.status(200).json(accessToken)
     } catch (error) {
+        // console.log(error)
         res.status(401).json({
-            message: "No email"
+            message: "email sudah ada"
         })    
     }
 }
