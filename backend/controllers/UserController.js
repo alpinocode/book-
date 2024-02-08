@@ -22,7 +22,6 @@ export const Register = async (req,res) => {
     if(password !== confPassword) return res.status(401).json({ message: 'Wrong password'})
     const salt = await bcrypt.genSalt()
     const hastPassword = await bcrypt.hash(password, salt)
-    
     try {
         await Users.create({
             name: name,
@@ -67,7 +66,6 @@ export const Login = async (req,res) => {
         })
         res.status(200).json(accessToken)
     } catch (error) {
-        // console.log(error)
         res.status(401).json({
             message: "email sudah ada"
         })    
@@ -75,8 +73,8 @@ export const Login = async (req,res) => {
 }
 
 export const Logout = async (req,res) => {
-        const refreshToken = await req.cookie.refreshToken
-        if(!refreshToken) return res.sendStatus(204)
+          const refreshToken = await req.cookies.refreshToken;
+        if(!refreshToken) return res.sendStatus(403)
         const user = await Users.findAll({
             where: {
                 refresh_token: refreshToken

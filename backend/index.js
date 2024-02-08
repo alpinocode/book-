@@ -5,7 +5,7 @@ import cors from 'cors'
 
 // route
 import userRoute from "./routes/UserRoute.js";
-import noteRoute from "./routes/NoteRoute.js"
+
 
 // import to connection database
 import db from './config/Server.js';
@@ -33,8 +33,9 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json())
 app.use(userRoute)
-app.use(noteRoute)
+
 
 app.listen(port, () => {
     console.log(`Server up and Running`)
 })
+    

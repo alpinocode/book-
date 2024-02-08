@@ -2,7 +2,8 @@ import express from 'express'
 import {
     getUser,
     Register,
-    Login
+    Login,
+    Logout
 } from '../controllers/UserController.js'
 import {
     RefreshToken
@@ -10,14 +11,21 @@ import {
 import { 
     VerifyToken
 } from '../middleware/VerifyToken.js'
+import {
+    getNote,
+    getNoteById,
+    createNote,
+    noteUpdate,
+    noteDelete
+} from '../controllers/NoteController.js'
 
 
 const router = express.Router()
 
-router.get('/user', VerifyToken,getUser)
+router.get('/user', VerifyToken,getUser, getNote, getNoteById, createNote, noteUpdate, noteDelete)
 router.post('/register', Register )
 router.post('/login', Login)
 router.get('/token', RefreshToken)
-
+router.delete('/logout', Logout)
 
 export default router
