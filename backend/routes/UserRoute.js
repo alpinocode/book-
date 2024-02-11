@@ -22,7 +22,7 @@ import {
 
 const router = express.Router()
 
-router.get('/user', VerifyToken,getUser, getNote, getNoteById, createNote, noteUpdate, noteDelete)
+router.get('/user', VerifyToken,getUser)
 router.post('/register', Register )
 router.post('/login', Login)
 router.get('/token', RefreshToken)
